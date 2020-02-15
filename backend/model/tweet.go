@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Tweet struct {
 	ID        string     `json:"id"`
@@ -15,4 +18,14 @@ type Tweet struct {
 type TweetOutput struct {
 	Tweet
 	NumRetweet int `json:"numRetweet" gorm:"column:numRetweet"`
+}
+
+// MarshalBinary for redis
+func (t TweetOutput) MarshalBinary() (data []byte, err error) {
+	return json.Marshal(t)
+}
+
+// UnmarshalBinary for redis
+func (t *TweetOutput) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, t)
 }

@@ -24,7 +24,7 @@ func (t *pgTweetRepository) TopTweets(ctx context.Context, offset int, limit int
 	FROM "tweets"
 	LEFT JOIN "tweets" AS "ret" ON "tweets"."id" = "ret"."retweet"
 	GROUP BY "tweets"."id"
-	ORDER BY "numRetweet" DESC
+	ORDER BY "numRetweet" DESC, "created_at" DESC
 	OFFSET ?
 	LIMIT ?
 	`
@@ -61,4 +61,8 @@ func (t *pgTweetRepository) GetByID(ctx context.Context, id string) (*model.Twee
 	}
 
 	return tweet, nil
+}
+
+func (t *pgTweetRepository) SetCacheTopTweets(ctx context.Context, offset int, tweets []model.TweetOutput) error {
+	panic("not implemented")
 }

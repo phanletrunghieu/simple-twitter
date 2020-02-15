@@ -33,7 +33,25 @@ func (r *Resolver) Query() QueryResolver {
 type mutationResolver struct{ *Resolver }
 
 func (r *mutationResolver) CreateTweet(ctx context.Context, owner string, content string) (*model.Tweet, error) {
-	panic("not implemented")
+	// encode
+	req := &tweet.CreateTweetRequest{
+		Tweet: model.Tweet{
+			Content: &content,
+			Owner:   owner,
+		},
+	}
+
+	// process
+	resp, err := r.endpoint.Tweet.CreateTweet(ctx, req)
+	if err != nil {
+		myErr := err.(util.MyError)
+		util.GQLerror(myErr.Message, strconv.Itoa(myErr.ErrorCode))
+		return nil, nil
+	}
+
+	// decode
+	result := resp.(*model.Tweet)
+	return result, nil
 }
 func (r *mutationResolver) Retweet(ctx context.Context, owner string, tweetID string) (*model.Tweet, error) {
 	panic("not implemented")

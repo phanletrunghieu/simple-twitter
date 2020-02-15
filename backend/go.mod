@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/99designs/gqlgen v0.10.2
 	github.com/99designs/gqlgen-contrib v0.0.0-20191030030013-7aa27db3321a
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v3.3.2+incompatible
 	github.com/go-redis/redis/v7 v7.1.0
 	github.com/jinzhu/gorm v1.9.12

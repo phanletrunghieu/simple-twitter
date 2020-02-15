@@ -4,6 +4,8 @@ exec:
 models:
   Tweet:
     model: simple-twitter/model.Tweet
+  Pagination:
+    model: simple-twitter/model.Pagination
 resolver:
   filename: tmp/resolver.go
   type: Resolver

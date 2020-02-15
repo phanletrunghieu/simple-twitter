@@ -2,5 +2,25 @@ scalar DateTime
 scalar Upload
 
 type Query {
-    test(skip: Int!, first: Int!): [Boolean!]!
+    topTweets(offset: Int!, limit: Int!): [Tweet!]!
+}
+
+type Mutation {
+  createTweet(owner: String!, content: String!): Tweet!
+  retweet(owner: String!, tweetID: ID!): Tweet!
+}
+
+type Pagination {
+    offset: Int!
+	limit: Int!
+}
+
+type Tweet {
+    id: ID!
+    content: String
+    owner: String!
+    retweet: String
+    numRetweet: Int!
+    created_at: DateTime!
+    updated_at: DateTime!
 }

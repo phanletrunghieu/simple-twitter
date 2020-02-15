@@ -57,6 +57,22 @@ func (t *cacheTweetRepository) SetCacheTopTweets(ctx context.Context, offset int
 	return nil
 }
 
+func (t *cacheTweetRepository) ClearCacheTopTweets(ctx context.Context) error {
+	retry := 0
+	for t.redis.LLen(key).Val() > 0 {
+		err := t.redis.LTrim(key, 0, -99).Err()
+		if err != nil {
+			retry++
+
+			if retry >= 3 {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func (t *cacheTweetRepository) CreateTweet(ctx context.Context, tweet *model.Tweet) (*model.Tweet, error) {
 	panic("not implemented")
 }

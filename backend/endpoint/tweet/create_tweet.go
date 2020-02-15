@@ -32,6 +32,9 @@ func MakeCreateTweetEndpoint(repo *repository.Repository) model.Endpoint {
 			return nil, util.NewError(err, http.StatusInternalServerError, 1020, "Error create new tweet")
 		}
 
+		// clean cache
+		repo.TweetCache.ClearCacheTopTweets(ctx)
+
 		return tweet, nil
 	}
 }

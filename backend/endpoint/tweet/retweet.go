@@ -47,6 +47,9 @@ func MakeRetweetEndpoint(repo *repository.Repository) model.Endpoint {
 			return nil, util.NewError(err, http.StatusInternalServerError, 1040, "Error retweet")
 		}
 
+		// clean cache
+		repo.TweetCache.ClearCacheTopTweets(ctx)
+
 		return tweet, nil
 	}
 }

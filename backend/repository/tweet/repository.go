@@ -11,4 +11,5 @@ type Repository interface {
 	CreateTweet(ctx context.Context, tweet *model.Tweet) (*model.Tweet, error)
 
 	SetCacheTopTweets(ctx context.Context, offset int, tweets []model.TweetOutput) error
+	ClearCacheTopTweets(ctx context.Context) error
 }

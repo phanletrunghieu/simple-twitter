@@ -1,0 +1,34 @@
+version: '3'
+
+volumes:
+  pgdata:
+
+services:
+  postgres:
+    image: crunchydata/crunchy-postgres:centos7-12.1-4.2.1
+    restart: always
+    environment:
+      PG_MODE: primary
+      PG_USER: dev
+      PG_PASSWORD: 123123
+      PG_DATABASE: app
+      PG_ROOT_PASSWORD: 123123
+      PG_PRIMARY_PORT: 5432
+      PG_PRIMARY_USER: repuser
+      PG_PRIMARY_PASSWORD: 123123
+    volumes:
+      - pgdata:/pgdata:Z
+    ports:
+      - "5432:5432"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  redis:
+    image: redis:5.0.7-alpine
+    restart: always
+    ports:
+      - 6379:6379

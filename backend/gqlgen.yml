@@ -1,0 +1,12 @@
+schema: delivery/http/graphql/schema.graphql
+exec:
+  filename: delivery/http/graphql/generated.go
+models:
+  Tweet:
+    model: simple-twitter/model.Tweet
+resolver:
+  filename: tmp/resolver.go
+  type: Resolver
+model:
+  filename: model/generated.go
+  package: model

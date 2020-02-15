@@ -8,6 +8,8 @@ import (
 	"simple-twitter/endpoint/tweet"
 	"simple-twitter/model"
 	"simple-twitter/util"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
 // THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
@@ -45,7 +47,7 @@ func (r *mutationResolver) CreateTweet(ctx context.Context, owner string, conten
 	resp, err := r.endpoint.Tweet.CreateTweet(ctx, req)
 	if err != nil {
 		myErr := err.(util.MyError)
-		util.GQLerror(myErr.Message, strconv.Itoa(myErr.ErrorCode))
+		graphql.AddError(ctx, util.GQLerror(myErr.Message, strconv.Itoa(myErr.ErrorCode)))
 		return nil, nil
 	}
 
@@ -54,7 +56,23 @@ func (r *mutationResolver) CreateTweet(ctx context.Context, owner string, conten
 	return result, nil
 }
 func (r *mutationResolver) Retweet(ctx context.Context, owner string, tweetID string) (*model.Tweet, error) {
-	panic("not implemented")
+	// encode
+	req := &tweet.RetweetRequest{
+		TweetID: tweetID,
+		Owner:   owner,
+	}
+
+	// process
+	resp, err := r.endpoint.Tweet.Retweet(ctx, req)
+	if err != nil {
+		myErr := err.(util.MyError)
+		graphql.AddError(ctx, util.GQLerror(myErr.Message, strconv.Itoa(myErr.ErrorCode)))
+		return nil, nil
+	}
+
+	// decode
+	result := resp.(*model.Tweet)
+	return result, nil
 }
 
 type queryResolver struct{ *Resolver }
@@ -73,7 +91,7 @@ func (r *queryResolver) TopTweets(ctx context.Context, offset int, limit int) ([
 	resp, err := r.endpoint.Tweet.GetTopTweets(ctx, req)
 	if err != nil {
 		myErr := err.(util.MyError)
-		util.GQLerror(myErr.Message, strconv.Itoa(myErr.ErrorCode))
+		graphql.AddError(ctx, util.GQLerror(myErr.Message, strconv.Itoa(myErr.ErrorCode)))
 		return nil, nil
 	}
 

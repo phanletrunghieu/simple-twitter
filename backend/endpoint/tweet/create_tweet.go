@@ -22,7 +22,7 @@ func MakeCreateTweetEndpoint(repo *repository.Repository) model.Endpoint {
 		}
 
 		// validation
-		if err := validate(req); err != nil {
+		if err := validateCreateTweet(req); err != nil {
 			return nil, err.(util.MyError)
 		}
 
@@ -36,7 +36,7 @@ func MakeCreateTweetEndpoint(repo *repository.Repository) model.Endpoint {
 	}
 }
 
-func validate(req *CreateTweetRequest) error {
+func validateCreateTweet(req *CreateTweetRequest) error {
 	if req.Tweet.Content == nil ||
 		(req.Tweet.Content != nil && *req.Tweet.Content == "") {
 		return util.NewError(nil, http.StatusNotAcceptable, 2020, "missing 'content'")

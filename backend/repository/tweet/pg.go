@@ -41,3 +41,13 @@ func (t *pgTweetRepository) CreateTweet(ctx context.Context, tweet *model.Tweet)
 
 	return tweet, nil
 }
+
+func (t *pgTweetRepository) GetByID(ctx context.Context, id string) (*model.Tweet, error) {
+	tweet := &model.Tweet{ID: id}
+	db := t.getClient()
+	if err := db.Find(tweet).Error; err != nil {
+		return nil, err
+	}
+
+	return tweet, nil
+}

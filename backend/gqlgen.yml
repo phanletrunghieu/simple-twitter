@@ -3,7 +3,7 @@ exec:
   filename: delivery/http/graphql/generated.go
 models:
   Tweet:
-    model: simple-twitter/model.Tweet
+    model: simple-twitter/model.TweetOutput
   Pagination:
     model: simple-twitter/model.Pagination
 resolver:

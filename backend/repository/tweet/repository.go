@@ -7,6 +7,6 @@ import (
 
 type Repository interface {
 	GetByID(ctx context.Context, id string) (*model.Tweet, error)
-	TopTweets(ctx context.Context, offset int, limit int) ([]model.Tweet, error)
+	TopTweets(ctx context.Context, offset int, limit int) ([]model.TweetOutput, error)
 	CreateTweet(ctx context.Context, tweet *model.Tweet) (*model.Tweet, error)
 }

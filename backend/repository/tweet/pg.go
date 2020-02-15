@@ -16,10 +16,21 @@ func NewPGTweetRepository(getClient func() *gorm.DB) Repository {
 	return &pgTweetRepository{getClient}
 }
 
-func (t *pgTweetRepository) TopTweets(ctx context.Context, offset int, limit int) ([]model.Tweet, error) {
-	tweets := []model.Tweet{}
+func (t *pgTweetRepository) TopTweets(ctx context.Context, offset int, limit int) ([]model.TweetOutput, error) {
+	tweets := []model.TweetOutput{}
+
+	query := `
+	SELECT "tweets".*, COUNT("ret"."id") AS "numRetweet"
+	FROM "tweets"
+	LEFT JOIN "tweets" AS "ret" ON "tweets"."id" = "ret"."retweet"
+	GROUP BY "tweets"."id"
+	ORDER BY "numRetweet" DESC
+	OFFSET ?
+	LIMIT ?
+	`
+
 	db := t.getClient()
-	if err := db.Find(&tweets).Error; err != nil {
+	if err := db.Raw(query, offset, limit).Scan(&tweets).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return tweets, nil
 		}

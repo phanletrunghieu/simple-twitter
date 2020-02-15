@@ -70,11 +70,11 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateTweet(ctx context.Context, owner string, content string) (*model.Tweet, error)
-	Retweet(ctx context.Context, owner string, tweetID string) (*model.Tweet, error)
+	CreateTweet(ctx context.Context, owner string, content string) (*model.TweetOutput, error)
+	Retweet(ctx context.Context, owner string, tweetID string) (*model.TweetOutput, error)
 }
 type QueryResolver interface {
-	TopTweets(ctx context.Context, offset int, limit int) ([]*model.Tweet, error)
+	TopTweets(ctx context.Context, offset int, limit int) ([]*model.TweetOutput, error)
 }
 
 type executableSchema struct {
@@ -439,10 +439,10 @@ func (ec *executionContext) _Mutation_createTweet(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Tweet)
+	res := resTmp.(*model.TweetOutput)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNTweet2ᚖsimpleᚑtwitterᚋmodelᚐTweet(ctx, field.Selections, res)
+	return ec.marshalNTweet2ᚖsimpleᚑtwitterᚋmodelᚐTweetOutput(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_retweet(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -483,10 +483,10 @@ func (ec *executionContext) _Mutation_retweet(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Tweet)
+	res := resTmp.(*model.TweetOutput)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNTweet2ᚖsimpleᚑtwitterᚋmodelᚐTweet(ctx, field.Selections, res)
+	return ec.marshalNTweet2ᚖsimpleᚑtwitterᚋmodelᚐTweetOutput(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Pagination_offset(ctx context.Context, field graphql.CollectedField, obj *model.Pagination) (ret graphql.Marshaler) {
@@ -601,10 +601,10 @@ func (ec *executionContext) _Query_topTweets(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Tweet)
+	res := resTmp.([]*model.TweetOutput)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNTweet2ᚕᚖsimpleᚑtwitterᚋmodelᚐTweetᚄ(ctx, field.Selections, res)
+	return ec.marshalNTweet2ᚕᚖsimpleᚑtwitterᚋmodelᚐTweetOutputᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -682,7 +682,7 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tweet_id(ctx context.Context, field graphql.CollectedField, obj *model.Tweet) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tweet_id(ctx context.Context, field graphql.CollectedField, obj *model.TweetOutput) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -719,7 +719,7 @@ func (ec *executionContext) _Tweet_id(ctx context.Context, field graphql.Collect
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tweet_content(ctx context.Context, field graphql.CollectedField, obj *model.Tweet) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tweet_content(ctx context.Context, field graphql.CollectedField, obj *model.TweetOutput) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -753,7 +753,7 @@ func (ec *executionContext) _Tweet_content(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tweet_owner(ctx context.Context, field graphql.CollectedField, obj *model.Tweet) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tweet_owner(ctx context.Context, field graphql.CollectedField, obj *model.TweetOutput) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -790,7 +790,7 @@ func (ec *executionContext) _Tweet_owner(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tweet_retweet(ctx context.Context, field graphql.CollectedField, obj *model.Tweet) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tweet_retweet(ctx context.Context, field graphql.CollectedField, obj *model.TweetOutput) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -824,7 +824,7 @@ func (ec *executionContext) _Tweet_retweet(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tweet_numRetweet(ctx context.Context, field graphql.CollectedField, obj *model.Tweet) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tweet_numRetweet(ctx context.Context, field graphql.CollectedField, obj *model.TweetOutput) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -861,7 +861,7 @@ func (ec *executionContext) _Tweet_numRetweet(ctx context.Context, field graphql
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tweet_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Tweet) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tweet_created_at(ctx context.Context, field graphql.CollectedField, obj *model.TweetOutput) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -898,7 +898,7 @@ func (ec *executionContext) _Tweet_created_at(ctx context.Context, field graphql
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tweet_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Tweet) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tweet_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.TweetOutput) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -2208,7 +2208,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 
 var tweetImplementors = []string{"Tweet"}
 
-func (ec *executionContext) _Tweet(ctx context.Context, sel ast.SelectionSet, obj *model.Tweet) graphql.Marshaler {
+func (ec *executionContext) _Tweet(ctx context.Context, sel ast.SelectionSet, obj *model.TweetOutput) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, tweetImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -2572,11 +2572,11 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalNTweet2simpleᚑtwitterᚋmodelᚐTweet(ctx context.Context, sel ast.SelectionSet, v model.Tweet) graphql.Marshaler {
+func (ec *executionContext) marshalNTweet2simpleᚑtwitterᚋmodelᚐTweetOutput(ctx context.Context, sel ast.SelectionSet, v model.TweetOutput) graphql.Marshaler {
 	return ec._Tweet(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNTweet2ᚕᚖsimpleᚑtwitterᚋmodelᚐTweetᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Tweet) graphql.Marshaler {
+func (ec *executionContext) marshalNTweet2ᚕᚖsimpleᚑtwitterᚋmodelᚐTweetOutputᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TweetOutput) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2600,7 +2600,7 @@ func (ec *executionContext) marshalNTweet2ᚕᚖsimpleᚑtwitterᚋmodelᚐTweet
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNTweet2ᚖsimpleᚑtwitterᚋmodelᚐTweet(ctx, sel, v[i])
+			ret[i] = ec.marshalNTweet2ᚖsimpleᚑtwitterᚋmodelᚐTweetOutput(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2613,7 +2613,7 @@ func (ec *executionContext) marshalNTweet2ᚕᚖsimpleᚑtwitterᚋmodelᚐTweet
 	return ret
 }
 
-func (ec *executionContext) marshalNTweet2ᚖsimpleᚑtwitterᚋmodelᚐTweet(ctx context.Context, sel ast.SelectionSet, v *model.Tweet) graphql.Marshaler {
+func (ec *executionContext) marshalNTweet2ᚖsimpleᚑtwitterᚋmodelᚐTweetOutput(ctx context.Context, sel ast.SelectionSet, v *model.TweetOutput) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

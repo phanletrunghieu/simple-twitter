@@ -4,12 +4,12 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/99designs/gqlgen/graphql"
+
 	"simple-twitter/endpoint"
 	"simple-twitter/endpoint/tweet"
 	"simple-twitter/model"
 	"simple-twitter/util"
-
-	"github.com/99designs/gqlgen/graphql"
 )
 
 // THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
@@ -34,7 +34,7 @@ func (r *Resolver) Query() QueryResolver {
 
 type mutationResolver struct{ *Resolver }
 
-func (r *mutationResolver) CreateTweet(ctx context.Context, owner string, content string) (*model.Tweet, error) {
+func (r *mutationResolver) CreateTweet(ctx context.Context, owner string, content string) (*model.TweetOutput, error) {
 	// encode
 	req := &tweet.CreateTweetRequest{
 		Tweet: model.Tweet{
@@ -52,10 +52,13 @@ func (r *mutationResolver) CreateTweet(ctx context.Context, owner string, conten
 	}
 
 	// decode
-	result := resp.(*model.Tweet)
+	tweet := resp.(*model.Tweet)
+	result := &model.TweetOutput{
+		Tweet: *tweet,
+	}
 	return result, nil
 }
-func (r *mutationResolver) Retweet(ctx context.Context, owner string, tweetID string) (*model.Tweet, error) {
+func (r *mutationResolver) Retweet(ctx context.Context, owner string, tweetID string) (*model.TweetOutput, error) {
 	// encode
 	req := &tweet.RetweetRequest{
 		TweetID: tweetID,
@@ -71,13 +74,16 @@ func (r *mutationResolver) Retweet(ctx context.Context, owner string, tweetID st
 	}
 
 	// decode
-	result := resp.(*model.Tweet)
+	tweet := resp.(*model.Tweet)
+	result := &model.TweetOutput{
+		Tweet: *tweet,
+	}
 	return result, nil
 }
 
 type queryResolver struct{ *Resolver }
 
-func (r *queryResolver) TopTweets(ctx context.Context, offset int, limit int) ([]*model.Tweet, error) {
+func (r *queryResolver) TopTweets(ctx context.Context, offset int, limit int) ([]*model.TweetOutput, error) {
 	// encode
 	req := &tweet.GetTopTweetsRequest{
 		Pagination: model.Pagination{
@@ -96,8 +102,8 @@ func (r *queryResolver) TopTweets(ctx context.Context, offset int, limit int) ([
 	}
 
 	// decode
-	tweets := resp.([]model.Tweet)
-	result := []*model.Tweet{}
+	tweets := resp.([]model.TweetOutput)
+	result := []*model.TweetOutput{}
 	for i := range tweets {
 		result = append(result, &tweets[i])
 	}

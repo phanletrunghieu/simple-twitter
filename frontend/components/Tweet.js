@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import {Icon, message, Popconfirm, notification} from 'antd'
-import nextCookie from 'next-cookies'
 import Link from 'next/link'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -10,19 +9,16 @@ import {TopTweetsAction} from '../redux/topTweets'
 import {MessageAction} from '../redux/message'
 import defaultAvatar from '../assert/images/default_profile_400x400.png'
 import css from '../assert/styles/component/tweet.scss'
+import cookie from 'js-cookie'
 
 export class Tweet extends Component {
-    static getInitialProps(ctx){
-        let username = nextCookie(ctx).token
-        return {username}
-    }
-
     notImplemented = () => {
         message.error("Not implemented")
     }
 
     onRetweet = (tweetID) => {
-        retweet(this.props.username, tweetID)
+        let username = cookie.get('token')
+        retweet(username, tweetID)
         .then(tweet=>{
             this.props.increaseRetweet(tweetID)
 

@@ -2,12 +2,12 @@ import React, {PureComponent} from 'react'
 import { Button} from 'antd';
 import { connect } from 'react-redux'
 import nextCookie from 'next-cookies'
+import Router from 'next/router'
 import {withAuthSync, signout} from '../utils/auth'
 import Tweet from '../components/Tweet'
 import TweetEditor from '../components/TweetEditor'
 import css from '../assert/styles/home.scss'
 import {createTweet} from '../api/mutations/createTweet'
-import {retweet} from '../api/mutations/retweet'
 import {TopTweetsAction} from '../redux/topTweets'
 import {MessageAction} from '../redux/message'
 
@@ -41,14 +41,6 @@ class Home extends PureComponent {
         .finally(() => this.setState({loadingCreateTweet: false}))
     }
 
-    onRetweet = (tweetID) => {
-        retweet(this.props.username, tweetID)
-        .then(()=>{
-            this.props.increaseRetweet(tweetID)
-        })
-        .catch(err => this.props.addError(err))
-    }
-
     render() {
         return (
             <div className={css.container}>
@@ -73,11 +65,12 @@ class Home extends PureComponent {
                             return (
                                 <Tweet
                                     key={i}
+                                    idForRetweet={tweet.id}
                                     username={tweet.owner}
                                     time={tweet.created_at}
                                     content={tweet.content}
                                     numRetweet={tweet.numRetweet}
-                                    onRetweet={()=>this.onRetweet(tweet.id)}
+                                    onClick={()=>Router.push(`/status/[id]`, `/status/${tweet.id}`)}
                                 />
                             )
                         } else {
@@ -85,12 +78,13 @@ class Home extends PureComponent {
                             return (
                                 <Tweet
                                     key={i}
+                                    idForRetweet={originTweet.id}
                                     retweetedBy={tweet.owner}
                                     username={originTweet.owner}
                                     time={originTweet.created_at}
                                     content={originTweet.content}
                                     numRetweet={originTweet.numRetweet}
-                                    onRetweet={()=>this.onRetweet(originTweet.id)}
+                                    onClick={()=>Router.push(`/status/[id]`, `/status/${tweet.id}`)}
                                 />
                             )
                         }
@@ -107,7 +101,6 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({
     getTopTweets: (offset, limit) => dispatch(TopTweetsAction.getTopTweetsRequest(offset, limit)),
-    increaseRetweet: (tweetID) => dispatch(TopTweetsAction.increaseRetweet(tweetID)),
     addError: (error) => dispatch(MessageAction.addError(error)),
 })
 

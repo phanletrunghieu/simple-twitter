@@ -1,13 +1,31 @@
 import React, { Component } from 'react'
 import {Icon, message, Popconfirm} from 'antd'
+import nextCookie from 'next-cookies'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import moment from 'moment'
+import {retweet} from '../api/mutations/retweet'
+import {TopTweetsAction} from '../redux/topTweets'
+import {MessageAction} from '../redux/message'
 import defaultAvatar from '../assert/images/default_profile_400x400.png'
 import css from '../assert/styles/component/tweet.scss'
 
-export default class Tweet extends Component {
+export class Tweet extends Component {
+    static getInitialProps(ctx){
+        let username = nextCookie(ctx).token
+        return {username}
+    }
+
     notImplemented = () => {
         message.error("Not implemented")
+    }
+
+    onRetweet = (tweetID) => {
+        retweet(this.props.username, tweetID)
+        .then(()=>{
+            this.props.increaseRetweet(tweetID)
+        })
+        .catch(err => this.props.addError(err))
     }
 
     render() {
@@ -26,11 +44,11 @@ export default class Tweet extends Component {
                         <img className={css.avatar} src={defaultAvatar}/>
                     </div>
                     <div className={css.right}>
-                        <div className={css.head}>
+                        <div className={css.head} onClick={this.props.onClick}>
                             <div className={css.username}>{this.props.username}</div>
                             <div className={css.time}>{moment(this.props.time).fromNow()}</div>
                         </div>
-                        <div className={css.content}>
+                        <div className={css.content} onClick={this.props.onClick}>
                             <span>{this.props.content}</span>
                         </div>
                         <div className={css.footer}>
@@ -48,7 +66,7 @@ export default class Tweet extends Component {
                                     placement="leftTop"
                                     okText="Retweet"
                                     cancelText="Cancel"
-                                    onConfirm={this.props.onRetweet}
+                                    onConfirm={() => this.onRetweet(this.props.idForRetweet)}
                                     icon={<Icon type="question-circle-o" />}
                                 >
                                     <button className={css['footer-button']}>
@@ -86,15 +104,26 @@ export default class Tweet extends Component {
 }
 
 Tweet.propTypes = {
+    idForRetweet: PropTypes.string.isRequired,
     username: PropTypes.string.isRequired,
     time: PropTypes.string.isRequired,
     content: PropTypes.string,
     retweetedBy: PropTypes.string,
     numRetweet: PropTypes.number,
-    onRetweet: PropTypes.func,
+    onClick: PropTypes.func,
 }
 
 Tweet.defaultProps = {
     numRetweet: 0,
-    onRetweet: () => {},
+    onClick: () => {},
 }
+
+const mapStateToProps = (state) => ({
+})
+
+const mapDispatchToProps = dispatch => ({
+    increaseRetweet: (tweetID) => dispatch(TopTweetsAction.increaseRetweet(tweetID)),
+    addError: (error) => dispatch(MessageAction.addError(error)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Tweet)

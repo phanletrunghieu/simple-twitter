@@ -24,7 +24,7 @@ func (t *pgTweetRepository) TopTweets(ctx context.Context, offset int, limit int
 	FROM "tweets"
 	LEFT JOIN "tweets" AS "ret" ON "tweets"."id" = "ret"."retweet"
 	GROUP BY "tweets"."id"
-	ORDER BY "numRetweet" DESC, "created_at" DESC
+	ORDER BY "numRetweet" DESC, "tweets"."retweet" DESC, "created_at" DESC
 	OFFSET ?
 	LIMIT ?
 	`
@@ -53,10 +53,19 @@ func (t *pgTweetRepository) CreateTweet(ctx context.Context, tweet *model.Tweet)
 	return tweet, nil
 }
 
-func (t *pgTweetRepository) GetByID(ctx context.Context, id string) (*model.Tweet, error) {
-	tweet := &model.Tweet{ID: id}
+func (t *pgTweetRepository) GetByID(ctx context.Context, id string) (*model.TweetOutput, error) {
+	tweet := &model.TweetOutput{}
+
+	query := `
+	SELECT "tweets".*, COUNT("ret"."id") AS "numRetweet"
+	FROM "tweets"
+	LEFT JOIN "tweets" AS "ret" ON "tweets"."id" = "ret"."retweet"
+	WHERE "tweets"."id" = ?
+	GROUP BY "tweets"."id"
+	`
+
 	db := t.getClient()
-	if err := db.Find(tweet).Error; err != nil {
+	if err := db.Raw(query, id).Scan(tweet).Error; err != nil {
 		return nil, err
 	}
 
@@ -68,5 +77,9 @@ func (t *pgTweetRepository) SetCacheTopTweets(ctx context.Context, offset int, t
 }
 
 func (t *pgTweetRepository) ClearCacheTopTweets(ctx context.Context) error {
+	panic("not implemented")
+}
+
+func (t *pgTweetRepository) CacheTweetByID(ctx context.Context, id string, tweet *model.TweetOutput) error {
 	panic("not implemented")
 }

@@ -38,6 +38,7 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
+	Tweet() TweetResolver
 }
 
 type DirectiveRoot struct {
@@ -56,16 +57,18 @@ type ComplexityRoot struct {
 
 	Query struct {
 		TopTweets func(childComplexity int, offset int, limit int) int
+		TweetByID func(childComplexity int, id string) int
 	}
 
 	Tweet struct {
-		Content    func(childComplexity int) int
-		CreatedAt  func(childComplexity int) int
-		ID         func(childComplexity int) int
-		NumRetweet func(childComplexity int) int
-		Owner      func(childComplexity int) int
-		Retweet    func(childComplexity int) int
-		UpdatedAt  func(childComplexity int) int
+		Content     func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		ID          func(childComplexity int) int
+		NumRetweet  func(childComplexity int) int
+		OriginTweet func(childComplexity int) int
+		Owner       func(childComplexity int) int
+		Retweet     func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
 	}
 }
 
@@ -75,6 +78,10 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	TopTweets(ctx context.Context, offset int, limit int) ([]*model.TweetOutput, error)
+	TweetByID(ctx context.Context, id string) (*model.TweetOutput, error)
+}
+type TweetResolver interface {
+	OriginTweet(ctx context.Context, obj *model.TweetOutput) (*model.TweetOutput, error)
 }
 
 type executableSchema struct {
@@ -142,6 +149,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.TopTweets(childComplexity, args["offset"].(int), args["limit"].(int)), true
 
+	case "Query.tweetByID":
+		if e.complexity.Query.TweetByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_tweetByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TweetByID(childComplexity, args["id"].(string)), true
+
 	case "Tweet.content":
 		if e.complexity.Tweet.Content == nil {
 			break
@@ -169,6 +188,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tweet.NumRetweet(childComplexity), true
+
+	case "Tweet.originTweet":
+		if e.complexity.Tweet.OriginTweet == nil {
+			break
+		}
+
+		return e.complexity.Tweet.OriginTweet(childComplexity), true
 
 	case "Tweet.owner":
 		if e.complexity.Tweet.Owner == nil {
@@ -258,6 +284,7 @@ scalar Upload
 
 type Query {
     topTweets(offset: Int!, limit: Int!): [Tweet!]!
+    tweetByID(id: ID!): Tweet!
 }
 
 type Mutation {
@@ -275,6 +302,7 @@ type Tweet {
     content: String
     owner: String!
     retweet: String
+    originTweet: Tweet
     numRetweet: Int!
     created_at: Time!
     updated_at: Time!
@@ -362,6 +390,20 @@ func (ec *executionContext) field_Query_topTweets_args(ctx context.Context, rawA
 		}
 	}
 	args["limit"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_tweetByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -607,6 +649,50 @@ func (ec *executionContext) _Query_topTweets(ctx context.Context, field graphql.
 	return ec.marshalNTweet2ᚕᚖsimpleᚑtwitterᚋmodelᚐTweetOutputᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_tweetByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_tweetByID_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TweetByID(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.TweetOutput)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNTweet2ᚖsimpleᚑtwitterᚋmodelᚐTweetOutput(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -822,6 +908,40 @@ func (ec *executionContext) _Tweet_retweet(ctx context.Context, field graphql.Co
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tweet_originTweet(ctx context.Context, field graphql.CollectedField, obj *model.TweetOutput) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Tweet",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Tweet().OriginTweet(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TweetOutput)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOTweet2ᚖsimpleᚑtwitterᚋmodelᚐTweetOutput(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tweet_numRetweet(ctx context.Context, field graphql.CollectedField, obj *model.TweetOutput) (ret graphql.Marshaler) {
@@ -2191,6 +2311,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "tweetByID":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_tweetByID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -2220,31 +2354,42 @@ func (ec *executionContext) _Tweet(ctx context.Context, sel ast.SelectionSet, ob
 		case "id":
 			out.Values[i] = ec._Tweet_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "content":
 			out.Values[i] = ec._Tweet_content(ctx, field, obj)
 		case "owner":
 			out.Values[i] = ec._Tweet_owner(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "retweet":
 			out.Values[i] = ec._Tweet_retweet(ctx, field, obj)
+		case "originTweet":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Tweet_originTweet(ctx, field, obj)
+				return res
+			})
 		case "numRetweet":
 			out.Values[i] = ec._Tweet_numRetweet(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "created_at":
 			out.Values[i] = ec._Tweet_created_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "updated_at":
 			out.Values[i] = ec._Tweet_updated_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -2893,6 +3038,17 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return ec.marshalOString2string(ctx, sel, *v)
+}
+
+func (ec *executionContext) marshalOTweet2simpleᚑtwitterᚋmodelᚐTweetOutput(ctx context.Context, sel ast.SelectionSet, v model.TweetOutput) graphql.Marshaler {
+	return ec._Tweet(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOTweet2ᚖsimpleᚑtwitterᚋmodelᚐTweetOutput(ctx context.Context, sel ast.SelectionSet, v *model.TweetOutput) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Tweet(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

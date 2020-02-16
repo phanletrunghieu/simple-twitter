@@ -9,6 +9,7 @@ import (
 	"simple-twitter/endpoint"
 	"simple-twitter/endpoint/tweet"
 	"simple-twitter/model"
+	"simple-twitter/repository"
 	"simple-twitter/util"
 )
 
@@ -16,12 +17,14 @@ import (
 
 type Resolver struct {
 	endpoint *endpoint.Endpoint
+	repo     *repository.Repository
 }
 
 // NewResolver .
-func NewResolver(ep *endpoint.Endpoint) *Resolver {
+func NewResolver(ep *endpoint.Endpoint, repo *repository.Repository) *Resolver {
 	return &Resolver{
 		endpoint: ep,
+		repo:     repo,
 	}
 }
 
@@ -30,6 +33,9 @@ func (r *Resolver) Mutation() MutationResolver {
 }
 func (r *Resolver) Query() QueryResolver {
 	return &queryResolver{r}
+}
+func (r *Resolver) Tweet() TweetResolver {
+	return &tweetResolver{r}
 }
 
 type mutationResolver struct{ *Resolver }
@@ -108,4 +114,31 @@ func (r *queryResolver) TopTweets(ctx context.Context, offset int, limit int) ([
 		result = append(result, &tweets[i])
 	}
 	return result, nil
+}
+
+func (r *queryResolver) TweetByID(ctx context.Context, id string) (*model.TweetOutput, error) {
+	// encode
+	req := &tweet.GetTweetByIDRequest{ID: id}
+
+	// process
+	resp, err := r.endpoint.Tweet.GetByID(ctx, req)
+	if err != nil {
+		myErr := err.(util.MyError)
+		graphql.AddError(ctx, util.GQLerror(myErr.Message, strconv.Itoa(myErr.ErrorCode)))
+		return nil, nil
+	}
+
+	// decode
+	tweet := resp.(*model.TweetOutput)
+	return tweet, nil
+}
+
+type tweetResolver struct{ *Resolver }
+
+func (r *tweetResolver) OriginTweet(ctx context.Context, obj *model.TweetOutput) (*model.TweetOutput, error) {
+	if obj.Retweet == nil {
+		return nil, nil
+	}
+
+	return r.repo.Tweet.GetByID(ctx, *obj.Retweet)
 }

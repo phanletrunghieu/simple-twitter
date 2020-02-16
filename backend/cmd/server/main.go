@@ -21,7 +21,7 @@ func main() {
 
 	repo := repository.New(postgres.GetClient, redis.GetClient())
 	ep := endpoint.New(repo)
-	h := serviceHttp.NewHTTPHandler(ep)
+	h := serviceHttp.NewHTTPHandler(ep, repo)
 
 	errs := make(chan error)
 	go func() {

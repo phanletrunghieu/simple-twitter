@@ -3,6 +3,7 @@ scalar Upload
 
 type Query {
     topTweets(offset: Int!, limit: Int!): [Tweet!]!
+    tweetByID(id: ID!): Tweet!
 }
 
 type Mutation {
@@ -20,6 +21,7 @@ type Tweet {
     content: String
     owner: String!
     retweet: String
+    originTweet: Tweet
     numRetweet: Int!
     created_at: Time!
     updated_at: Time!

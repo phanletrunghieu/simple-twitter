@@ -1,6 +1,16 @@
 .container{
-    padding: 10px 15px;
+    position: relative;
     border: 1px solid rgb(230, 236, 240);
+    border-top: 0;
+}
+
+.progress{
+    position: absolute;
+    top: -9px;
+}
+
+.editor-container{
+    padding: 10px 15px;
     display: flex;
     flex-direction: row;
 
@@ -37,6 +47,10 @@
     color: #9197a3;
     font-size: 19px;
     font-weight: 400;
+}
+
+[contenteditable=true]:empty:focus:before {
+    color: #bdc1c9;
 }
 
 .footer{

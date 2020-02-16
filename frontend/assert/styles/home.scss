@@ -1,0 +1,25 @@
+@import  './mixin/color.scss';
+
+.container{
+    max-width: 600px;
+    margin: auto;
+}
+
+.title{
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
+    font-size: 19px;
+    font-weight: 800;
+    color: $text-color;
+    padding: 15px;
+    border: 1px solid rgb(230, 236, 240);
+}
+
+.signout-button{
+    position: fixed;
+    top: 10px;
+    right: 10px;
+}

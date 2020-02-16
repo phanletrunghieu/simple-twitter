@@ -2,16 +2,38 @@
     padding: 10px 15px;
     border: 1px solid rgb(230, 236, 240);
     border-top: 0;
+    cursor: pointer;
+
+    &:hover{
+        background-color: rgb(245, 248, 250);
+    }
+}
+
+.retweet{
+    font-size: 13px;
+    color: rgb(101, 119, 134);
+    margin-bottom: 5px;
     display: flex;
     flex-direction: row;
-    cursor: pointer;
+    align-items: center;
 
     &>*{
         margin: 0 5px;
     }
+}
 
-    &:hover{
-        background-color: rgb(245, 248, 250);
+.retweet-icon{
+    flex-grow: 0;
+    flex-basis: 50px;
+    text-align: right;
+}
+
+.tweet-container{
+    display: flex;
+    flex-direction: row;
+
+    &>*{
+        margin: 0 5px;
     }
 }
 
@@ -61,25 +83,45 @@
 .footer-button{
     background-color: transparent;
     border: 0;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
     cursor: pointer;
 
-    &:hover{
-        background-color: rgba(23, 191, 99, 0.2);;
-
-        &>.footer-button-icon{
-            color: rgb(23, 191, 99);
-        }
-    }
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 
     &:focus{
         outline: none;
     }
+
+    &:hover{
+        .footer-button-icon,
+        .footer-button-count{
+            color: rgb(23, 191, 99);
+        }
+
+        &>.footer-button-icon-container{
+            background-color: rgba(23, 191, 99, 0.2);
+        }
+    }
+}
+
+.footer-button-icon-container{
+    background-color: transparent;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .footer-button-icon{
     color: rgb(101, 119, 134);
     font-size: 15px;
+}
+
+.footer-button-count{
+    vertical-align: middle;
+    margin-left: 5px;
 }

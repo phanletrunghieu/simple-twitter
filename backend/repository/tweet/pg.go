@@ -83,3 +83,7 @@ func (t *pgTweetRepository) ClearCacheTopTweets(ctx context.Context) error {
 func (t *pgTweetRepository) CacheTweetByID(ctx context.Context, id string, tweet *model.TweetOutput) error {
 	panic("not implemented")
 }
+
+func (t *pgTweetRepository) ClearCacheTweetByID(ctx context.Context, id string) error {
+	panic("not implemented")
+}

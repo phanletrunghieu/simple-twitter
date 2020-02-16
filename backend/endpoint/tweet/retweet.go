@@ -49,6 +49,7 @@ func MakeRetweetEndpoint(repo *repository.Repository) model.Endpoint {
 
 		// clean cache
 		repo.TweetCache.ClearCacheTopTweets(ctx)
+		repo.TweetCache.ClearCacheTweetByID(ctx, req.TweetID)
 
 		return tweet, nil
 	}

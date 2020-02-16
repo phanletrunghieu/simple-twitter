@@ -88,3 +88,7 @@ func (t *cacheTweetRepository) GetByID(ctx context.Context, id string) (*model.T
 func (t *cacheTweetRepository) CacheTweetByID(ctx context.Context, id string, tweets *model.TweetOutput) error {
 	return t.redis.Set(keyTweetID+id, tweets, time.Hour).Err()
 }
+
+func (t *cacheTweetRepository) ClearCacheTweetByID(ctx context.Context, id string) error {
+	return t.redis.Del(keyTweetID + id).Err()
+}

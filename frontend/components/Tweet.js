@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import {Icon, message, Popconfirm} from 'antd'
+import {Icon, message, Popconfirm, notification} from 'antd'
 import nextCookie from 'next-cookies'
+import Link from 'next/link'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import moment from 'moment'
@@ -22,8 +23,15 @@ export class Tweet extends Component {
 
     onRetweet = (tweetID) => {
         retweet(this.props.username, tweetID)
-        .then(()=>{
+        .then(tweet=>{
             this.props.increaseRetweet(tweetID)
+
+            notification.success({
+                message: 'Success',
+                description: (
+                    <div>Your Tweet was sent. <Link href="/status/[id]" as={`/status/${tweet.id}`}>View</Link></div>
+                ),
+            });
         })
         .catch(err => this.props.addError(err))
     }
@@ -49,7 +57,7 @@ export class Tweet extends Component {
                             <div className={css.time}>{moment(this.props.time).fromNow()}</div>
                         </div>
                         <div className={css.content} onClick={this.props.onClick}>
-                            <span>{this.props.content}</span>
+                            <span dangerouslySetInnerHTML={{__html: this.props.content}}/>
                         </div>
                         <div className={css.footer}>
                             <div>

@@ -1,8 +1,9 @@
 import React, {PureComponent} from 'react'
-import { Button} from 'antd';
+import { Button, notification} from 'antd';
 import { connect } from 'react-redux'
 import nextCookie from 'next-cookies'
 import Router from 'next/router'
+import Link from 'next/link'
 import {withAuthSync, signout} from '../utils/auth'
 import Tweet from '../components/Tweet'
 import TweetEditor from '../components/TweetEditor'
@@ -33,9 +34,16 @@ class Home extends PureComponent {
     onClickCreateTweet = () => {
         this.setState({loadingCreateTweet: true})
         createTweet(this.props.username, this.state.newTweet)
-        .then(() => {
+        .then(tweet => {
             this.props.getTopTweets(0, 10)
             this.setState({newTweet: ""})
+
+            notification.success({
+                message: 'Success',
+                description: (
+                    <div>Your Tweet was sent. <Link href="/status/[id]" as={`/status/${tweet.id}`}>View</Link></div>
+                ),
+            });
         })
         .catch(err => this.props.addError(err))
         .finally(() => this.setState({loadingCreateTweet: false}))

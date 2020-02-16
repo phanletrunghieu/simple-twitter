@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { withRouter } from 'next/router'
-import { Icon } from 'antd'
-import { withAuthSync } from '../../utils/auth'
+import { Icon, Button } from 'antd'
+import { withAuthSync, signout } from '../../utils/auth'
 import { getTweetByID } from '../../api/queries/getTweetByID'
 import Tweet from '../../components/Tweet'
 import homecss from '../../assert/styles/home.scss'
@@ -22,6 +22,14 @@ class TweetPage extends Component {
         const {originTweet} = tweet
         return (
             <div className={homecss.container}>
+                <Button
+                    className={homecss['signout-button']}
+                    type="primary"
+                    shape="round"
+                    onClick={signout}
+                >
+                    Sign out
+                </Button>
                 <div className={css['title-cotainer']}>
                     <div className={css['back-button']} onClick={this.props.router.back}>
                         <Icon type="arrow-left" className={css['back-icon']} />

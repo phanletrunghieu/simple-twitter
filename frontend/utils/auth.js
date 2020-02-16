@@ -2,27 +2,25 @@ import { useEffect } from 'react'
 import Router from 'next/router'
 import nextCookie from 'next-cookies'
 import cookie from 'js-cookie'
-import { newAxios } from './http'
 
 export const storeToken = ({ token }) => {
     cookie.set('token', token, { expires: 1 })
+    Router.push('/home')
 }
 
 export const auth = ctx => {
     const { token } = nextCookie(ctx)
 
     /*
-     * If `ctx.req` is available it means we are on the server.
      * Additionally if there's no token it means the user is not logged in.
      */
-    if (ctx.req && !token) {
-        ctx.res.writeHead(302, { Location: '/' })
-        ctx.res.end()
-    }
-  
-    // We already checked for server. This should only happen on client.
     if (!token) {
-        Router.push('/')
+        if (typeof window === 'undefined') {
+            ctx.res.writeHead(302, { Location: '/' })
+            ctx.res.end()
+        } else {
+            Router.push('/')
+        }
     }
   
     return token
@@ -51,14 +49,38 @@ export const withAuthSync = WrappedComponent => {
                 window.removeEventListener('storage', syncLogout)
                 window.localStorage.removeItem('signout')
             }
-        }, [null])
+        }, [])
     
         return <WrappedComponent {...props} />
     }
   
     Wrapper.getInitialProps = async ctx => {
-        newAxios(ctx)
         const token = auth(ctx)
+    
+        const componentProps =
+            WrappedComponent.getInitialProps &&
+            (await WrappedComponent.getInitialProps(ctx))
+    
+        return { ...componentProps, token }
+    }
+  
+    return Wrapper
+}
+
+export const withAuthRedirect = WrappedComponent => {
+    const Wrapper = props => <WrappedComponent {...props} />
+
+    Wrapper.getInitialProps = async ctx => {
+        const { token } = nextCookie(ctx)
+
+        if (token) {
+            if (typeof window === 'undefined') {
+                ctx.res.writeHead(302, { Location: '/home' })
+                ctx.res.end()
+            } else {
+                Router.push('/home')
+            }
+        }
     
         const componentProps =
             WrappedComponent.getInitialProps &&
